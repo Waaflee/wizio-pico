@@ -114,7 +114,7 @@ def convert_to_carray(file_content):
 
 def convert_to_uf2(file_content):
     global familyid
-    #print("  FamilyID:", hex(familyid))
+    # print("  FamilyID:", hex(familyid))
     datapadding = b""
     while len(datapadding) < 512 - 256 - 32 - 4:
         datapadding += b"\x00\x00\x00\x00"
@@ -366,6 +366,36 @@ def dev_uploader(target, source, env):
     time.sleep(.1)
     write_file(uf2_name, outbuf)  # write uf2 to build folder
 
+    # Uploads via picoprobe protocol
+    if env.GetProjectOption("upload_protocol") == "picoprobe":
+        # TODO: tidy this part
+
+        # Gets Picoprobe configuration
+        picoprobe = env.BoardConfig().__dict__[
+            "_manifest"]["debug"]["tools"]["picoprobe"]
+        
+        # path to picoprobe binary
+        path = join(env.PioPlatform().get_package_dir(
+            'tool-pico-openocd'), picoprobe["server"]["executable"])
+        
+        # extra arguments to configure openocd
+        arguments = ' '.join(picoprobe["server"]["arguments"]).replace("$PACKAGE_DIR", env.PioPlatform().get_package_dir(
+            'tool-pico-openocd'))
+        
+        # openocd run command, upload .elf binary
+        order = f"-c 'program {elf_name} verify reset exit'"
+       
+        command = ' '.join([path, arguments, order])
+        if sys.platform == "win32":
+            command = command.replace("\\", "/").replace("'", "\"")
+
+        # TODO: this could be improved (less verbose, better error handling, etc)
+        print("Flashing through picoprobe...")
+        os.system(command)
+        print("Done.")
+        return
+
+    # Uploads uf2 to configured 'upload_port'
     if drive:
         if has_info(drive):
             print("Flashing %s (%s)" % (drive, board_id(drive)))
@@ -377,9 +407,10 @@ def dev_uploader(target, source, env):
                 "Pico USB drive not found on provided \"upload_port\". " +
                 "Falling back to auto port detection...")
 
+    # Uploads uf2 to auto determined directory
     drives = get_drives()
     if len(drives) == 0:
-        #raise RuntimeError("Pico USB drive not found.")
+        # raise RuntimeError("Pico USB drive not found.")
         print("\033[1;37;41m                               ")
         print("\033[1;37;41m   Pico USB drive not found.   ")
         print("\033[1;37;41m                               ")

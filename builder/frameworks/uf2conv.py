@@ -387,7 +387,9 @@ def dev_uploader(target, source, env):
         order = f"-c 'program {elf_name} verify reset exit'"
        
         command = ' '.join([path, arguments, order])
-       
+        if sys.platform == "win32":
+            command = command.replace("\\", "/").replace("'", "\"")
+
         # TODO: this could be improved (less verbose, better error handling, etc)
         print("Flashing through picoprobe...")
         os.system(command)

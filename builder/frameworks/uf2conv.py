@@ -366,10 +366,6 @@ def dev_uploader(target, source, env):
     time.sleep(.1)
     write_file(uf2_name, outbuf)  # write uf2 to build folder
 
-    print("===================")
-    print(env)
-    print("===================")
-
     if drive:
         if has_info(drive):
             print("Flashing %s (%s)" % (drive, board_id(drive)))

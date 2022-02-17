@@ -370,18 +370,24 @@ def dev_uploader(target, source, env):
     # Uploads via picoprobe protocol
     if env.GetProjectOption("upload_protocol") == "picoprobe":
         # TODO: tidy this part
+
         # Gets Picoprobe configuration
         picoprobe = env.BoardConfig().__dict__[
             "_manifest"]["debug"]["tools"]["picoprobe"]
+        
         # path to picoprobe binary
-        path = env.PioPlatform().get_package_dir(
-            'tool-pico-openocd') + "/" + picoprobe["server"]["executable"]
+        path = join(env.PioPlatform().get_package_dir(
+            'tool-pico-openocd'), picoprobe["server"]["executable"])
+        
         # extra arguments to configure openocd
         arguments = ' '.join(picoprobe["server"]["arguments"]).replace("$PACKAGE_DIR", env.PioPlatform().get_package_dir(
             'tool-pico-openocd'))
+        
         # openocd run command, upload .elf binary
         order = f"-c 'program {elf_name} verify reset exit'"
+       
         command = ' '.join([path, arguments, order])
+       
         # TODO: this could be improved (less verbose, better error handling, etc)
         print("Flashing through picoprobe...")
         os.system(command)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from ast import arguments
 import sys
 import struct
 import subprocess

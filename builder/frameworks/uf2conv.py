@@ -373,18 +373,19 @@ def dev_uploader(target, source, env):
         # Gets Picoprobe configuration
         picoprobe = env.BoardConfig().__dict__[
             "_manifest"]["debug"]["tools"]["picoprobe"]
-        
+
         # path to picoprobe binary
         path = join(env.PioPlatform().get_package_dir(
             'tool-pico-openocd'), picoprobe["server"]["executable"])
-        
+
         # extra arguments to configure openocd
         arguments = ' '.join(picoprobe["server"]["arguments"]).replace("$PACKAGE_DIR", env.PioPlatform().get_package_dir(
             'tool-pico-openocd'))
-        
+
         # openocd run command, upload .elf binary
-        order = f"-c 'program {elf_name} verify reset exit'"
-       
+        path_to_elf_file = elf_name.replace(" ", "\ ")
+        order = f"-c 'program {path_to_elf_file} verify reset exit'"
+
         command = ' '.join([path, arguments, order])
         if sys.platform == "win32":
             command = command.replace("\\", "/").replace("'", "\"")

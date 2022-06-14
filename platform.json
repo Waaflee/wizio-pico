@@ -45,7 +45,7 @@
         "version": "https://github.com/Wiz-IO/tool-wizio-pico.git"
     }, 
     "tool-pico-openocd": {
-      "optional": true,
+      "optional": false,
       "type": "debugger",
       "version": "https://github.com/Waaflee/tool-pico-openocd.git"
     } 
